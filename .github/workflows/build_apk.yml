@@ -1,43 +1,24 @@
 name: Flutter Build APK
-
-on:
-  push:
-    branches:
-      - main
-
+on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.x'
-
-      - name: Prepare Android Environment
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v3
+        with: { distribution: 'zulu', java-version: '17' }
+      - uses: subosito/flutter-action@v2
+        with: { flutter-version: '3.x' }
+      
+      - name: Build with Gradle
         run: |
+          # Flutter derleme sistemini değil, doğrudan Gradle sistemini tetikliyoruz
+          flutter pub get
           echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
-          # Gradle'a çalıştırılabilir yetkisi ver
-          chmod +x android/gradlew
-
-      - name: Get Dependencies
-        run: flutter pub get
-
-      - name: Build APK (Gradle Wrapper)
-        run: |
-          cd android
-          ./gradlew assembleRelease --no-daemon
-
-      - name: Upload APK
+          # gradlew yerine 'gradle' komutunu kullanarak wrapper bağımlılığından kurtuluyoruz
+          gradle assembleRelease --no-daemon -p android
+      
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: app-release
