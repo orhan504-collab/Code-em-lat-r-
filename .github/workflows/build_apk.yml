@@ -22,21 +22,24 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.x'
-          channel: 'stable'
 
-      - name: Clean and Get Dependencies
-        run: |
-          flutter clean
-          flutter pub get
-
-      - name: Build APK (No Daemon)
+      - name: Prepare Android Environment
         run: |
           echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
-          flutter build apk --release --no-daemon --verbose
+          # Gradle'a çalıştırılabilir yetkisi ver
+          chmod +x android/gradlew
+
+      - name: Get Dependencies
+        run: flutter pub get
+
+      - name: Build APK (Gradle Wrapper)
+        run: |
+          cd android
+          ./gradlew assembleRelease --no-daemon
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-release
-          path: build/app/outputs/flutter-apk/app-release-release.apk
+          path: android/app/build/outputs/apk/release/app-release-unsigned.apk
           
