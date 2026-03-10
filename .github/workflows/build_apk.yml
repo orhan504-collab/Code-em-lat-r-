@@ -1,4 +1,5 @@
-name: Flutter Build APK
+      - name: Build APK
+        run: flutter build apk --release --no-daemon --verbose
 
 on:
   push:
