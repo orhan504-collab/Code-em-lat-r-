@@ -1,5 +1,4 @@
-      - name: Build APK
-        run: flutter build apk --release --no-daemon --verbose
+name: Flutter Build APK
 
 on:
   push:
@@ -25,16 +24,15 @@ jobs:
           flutter-version: '3.x'
           channel: 'stable'
 
-      - name: Prepare Android Local Properties
+      - name: Clean and Get Dependencies
+        run: |
+          flutter clean
+          flutter pub get
+
+      - name: Build APK (No Daemon)
         run: |
           echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
-          echo "sdk.dir=$ANDROID_SDK_ROOT" >> android/local.properties
-
-      - name: Get Dependencies
-        run: flutter pub get
-
-      - name: Build APK
-        run: flutter build apk --release --verbose
+          flutter build apk --release --no-daemon --verbose
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
