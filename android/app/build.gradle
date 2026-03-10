@@ -8,17 +8,36 @@ android {
     namespace "com.example.meta_app"
     compileSdk 34
 
+    // AndroidX gereksinimleri için kritik ayarlar
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
     defaultConfig {
         applicationId "com.example.meta_app"
         minSdk 21
         targetSdk 34
         versionCode 1
         versionName "1.0"
+        
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
+            // Yayınlanacak APK'lar için imza ayarı
             signingConfig signingConfigs.debug
+            minifyEnabled false
+            shrinkResources false
         }
     }
+}
+
+flutter {
+    source '../..'
 }
