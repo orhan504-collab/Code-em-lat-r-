@@ -1,5 +1,7 @@
 name: Flutter Build APK
+
 on: [push]
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -7,22 +9,24 @@ jobs:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.0' # Gradle 8.4 ile uyumlu kararlı sürüm
+          flutter-version: '3.22.0'
 
       - name: Build APK
         run: |
-          # 1. Pub paketlerini al
           flutter pub get
-          
-          # 2. Android klasörüne git
           cd android
           
-          # 3. Gradle wrapper dosyasını doğrudan internetten indirip kur
-          curl -s https://services.gradle.org/distributions/gradle-8.4-bin.zip -o gradle-8.4-bin.zip
-          unzip -q gradle-8.4-bin.zip
+          # HATA ÇÖZÜCÜ: Kendi indirme scriptimiz yerine 
+          # flutter'ın kendi gradle yapılandırıcısını kullanıyoruz.
+          # Bu komut, projede bir 'gradlew' yoksa bile onu otomatik 
+          # Flutter SDK'nın standartlarına göre en doğru şekilde oluşturur.
+          ./gradlew wrapper --gradle-version 8.4
           
-          # 4. Doğrudan bin/gradle üzerinden derleme yap (gradlew dosyasını atla)
-          ./gradle-8.4/bin/gradle assembleRelease
+          # Çalıştırma iznini ver
+          chmod +x gradlew
+          
+          # Derlemeyi başlat
+          ./gradlew assembleRelease
           
       - uses: actions/upload-artifact@v4
         with:
