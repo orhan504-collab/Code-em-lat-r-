@@ -7,17 +7,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
+      # 1. Burası kritik: Flutter SDK'yı telefondan bağımsız olarak sunucuya kuruyoruz
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.22.0'
 
+      # 2. Android klasörü yoksa veya bozuksa, sunucu üzerinde yeniden oluşturuyoruz
+      - name: Create Android Structure
+        run: |
+          if [ ! -d "android" ]; then
+            flutter create .
+          fi
+
+      # 3. APK derleme
       - name: Build APK
         run: |
           flutter pub get
-          # gradlew ile uğraşmıyoruz, Flutter'ın kendi komutunu kullanıyoruz
-          flutter build apk --release --split-per-abi
-          
+          flutter build apk --release
+
       - uses: actions/upload-artifact@v4
         with:
           name: app-release
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: build/app/outputs/flutter-apk/app-release-release.apk
