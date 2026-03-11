@@ -14,17 +14,22 @@ jobs:
         with:
           flutter-version: '3.x'
 
-      - name: Build APK
+      - name: Prepare Android Environment
         run: |
-          flutter pub get
+          # Flutter SDK yolunu local.properties içine yazıyoruz
+          echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
+          
+          # Gradle Wrapper'ı temizle ve kararlı sürüme eşitle
           cd android
-          # 1. Gradle Wrapper'ı temizle ve yeniden oluştur (Hatalı sürümleri siler)
           rm -rf gradle/wrapper/gradle-wrapper.jar
           gradle wrapper --gradle-version 8.4
-          # 2. Çalıştırma izni ver
           chmod +x gradlew
-          # 3. Derlemeyi başlat
-          ./gradlew assembleRelease --no-daemon
+
+      - name: Build APK
+        run: |
+          cd android
+          # Eklentiyi bulamama hatasına karşı doğrudan derleme tetikleme
+          ./gradlew assembleRelease --no-daemon -Dorg.gradle.jvmargs="-Xmx2048m -XX:MaxMetaspaceSize=512m"
           
       - name: Upload APK
         uses: actions/upload-artifact@v4
