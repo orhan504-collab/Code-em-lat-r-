@@ -16,10 +16,7 @@ jobs:
 
       - name: Prepare Android Environment
         run: |
-          # Flutter SDK yolunu local.properties içine yazıyoruz
           echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
-          
-          # Gradle Wrapper'ı temizle ve kararlı sürüme eşitle
           cd android
           rm -rf gradle/wrapper/gradle-wrapper.jar
           gradle wrapper --gradle-version 8.4
@@ -28,9 +25,8 @@ jobs:
       - name: Build APK
         run: |
           cd android
-          # Eklentiyi bulamama hatasına karşı doğrudan derleme tetikleme
-          ./gradlew assembleRelease --no-daemon -Dorg.gradle.jvmargs="-Xmx2048m -XX:MaxMetaspaceSize=512m"
-          
+          ./gradlew assembleRelease --no-daemon
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
