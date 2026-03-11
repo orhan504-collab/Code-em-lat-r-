@@ -1,28 +1,33 @@
 name: Flutter Build APK
+
 on: [push]
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
-        with: { flutter-version: '3.x' }
-      
+        with:
+          flutter-version: '3.x'
+
       - name: Build APK
         run: |
+          # 1. Proje içindeki bağımlılıkları al
           flutter pub get
+          
+          # 2. Android klasörüne geç
           cd android
-          # Sistemdeki Gradle 9.3.1 ile gelen tüm çakışmaları engellemek için 
-          # GRADLE_USER_HOME'u geçici bir klasöre yönlendiriyoruz.
-          export GRADLE_USER_HOME=$PWD/.gradle
           
-          # Gradle Wrapper'ı yeniden kur ve mutlaka 8.4 kullan
+          # 3. KÖKLÜ ÇÖZÜM: Mevcut gradle klasörünü sil ve Flutter SDK'nın 
+          # kendi içindeki doğru sürümü eşleştirmesini bekle
           rm -rf gradle/wrapper/
-          gradle wrapper --gradle-version 8.4
-          chmod +x gradlew
           
-          # Derlemeyi başlat
-          ./gradlew assembleRelease --no-daemon
+          # 4. Gradle Wrapper'ı yeniden oluştur
+          gradle wrapper --gradle-version 8.4
+          
+          # 5. Gradle daemon'ı tamamen kapat (Hataları önler)
+          ./gradlew assembleRelease --no-daemon --stacktrace
           
       - uses: actions/upload-artifact@v4
         with:
