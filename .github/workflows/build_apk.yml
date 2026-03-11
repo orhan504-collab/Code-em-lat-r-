@@ -6,21 +6,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.x'
-
+        with: { flutter-version: '3.x' }
+      
       - name: Build APK
         run: |
           flutter pub get
           cd android
-          # 1. GradleWrapper dosyası yoksa veya bozuksa en baştan oluştur
-          gradle wrapper --gradle-version 8.4
           
-          # 2. Çalıştırma yetkisi ver (Çok önemli!)
+          # HATA ÇÖZÜCÜ: Sistemdeki (hata veren) gradle'ı kullanmamak için 
+          # PATH değişkeninden temizliyoruz.
+          export PATH=/usr/bin:$PATH
+          
+          # Wrapper'ı 8.4 olarak güncelliyoruz
+          rm -rf gradle/wrapper/
+          ./gradlew wrapper --gradle-version 8.4
           chmod +x gradlew
           
-          # 3. Derlemeyi başlat
-          ./gradlew assembleRelease --no-daemon
+          # SADECE WRAPPER KULLANARAK DERLE
+          # Sistemdeki /usr/bin/gradle komutu asla devreye girmeyecek
+          ./gradlew assembleRelease --no-daemon --stacktrace
           
       - uses: actions/upload-artifact@v4
         with:
