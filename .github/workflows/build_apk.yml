@@ -14,22 +14,10 @@ jobs:
       - name: Build APK
         run: |
           flutter pub get
-          cd android
-          
-          # HATA ÇÖZÜCÜ: Kendi indirme scriptimiz yerine 
-          # flutter'ın kendi gradle yapılandırıcısını kullanıyoruz.
-          # Bu komut, projede bir 'gradlew' yoksa bile onu otomatik 
-          # Flutter SDK'nın standartlarına göre en doğru şekilde oluşturur.
-          ./gradlew wrapper --gradle-version 8.4
-          
-          # Çalıştırma iznini ver
-          chmod +x gradlew
-          
-          # Derlemeyi başlat
-          ./gradlew assembleRelease
+          # gradlew ile uğraşmıyoruz, Flutter'ın kendi komutunu kullanıyoruz
+          flutter build apk --release --split-per-abi
           
       - uses: actions/upload-artifact@v4
         with:
           name: app-release
-          path: android/app/build/outputs/apk/release/app-release-unsigned.apk
-          
+          path: build/app/outputs/flutter-apk/app-release.apk
