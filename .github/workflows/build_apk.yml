@@ -1,7 +1,5 @@
 name: Flutter Build APK
-
 on: [push]
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,19 +11,16 @@ jobs:
 
       - name: Build APK
         run: |
-          # 1. Pub paketlerini al
           flutter pub get
-          
-          # 2. Android klasörüne git
           cd android
+          # 1. GradleWrapper dosyası yoksa veya bozuksa en baştan oluştur
+          gradle wrapper --gradle-version 8.4
           
-          # 3. KÖKLÜ DEĞİŞİM: Gradle Wrapper'ı Flutter SDK'nın 
-          # kendi içindeki güvenli versiyonla eşle
-          ./gradlew wrapper --gradle-version 8.4 --distribution-type bin
+          # 2. Çalıştırma yetkisi ver (Çok önemli!)
+          chmod +x gradlew
           
-          # 4. SİSTEM GRADLE'INI DEĞİL, WRAPPER'I ÇALIŞTIR
-          # --no-build-cache ve --no-daemon ile temiz bir başlangıç
-          ./gradlew assembleRelease --no-daemon --no-build-cache
+          # 3. Derlemeyi başlat
+          ./gradlew assembleRelease --no-daemon
           
       - uses: actions/upload-artifact@v4
         with:
