@@ -6,29 +6,26 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.x'
 
-      - name: Prepare Android Environment
-        run: |
-          echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
-          cd android
-          rm -rf gradle/wrapper/gradle-wrapper.jar
-          gradle wrapper --gradle-version 8.4
-          chmod +x gradlew
-
       - name: Build APK
         run: |
+          flutter pub get
           cd android
+          # Sistemdeki hatalı Gradle 9 yerine projendeki 8.4'ü temizle ve yeniden oluştur
+          rm -rf gradle/wrapper/
+          gradle wrapper --gradle-version 8.4
+          chmod +x gradlew
+          
+          # HATA ÇÖZÜCÜ: Sistem Gradle'ını değil, ./gradlew dosyasını çalıştırıyoruz
           ./gradlew assembleRelease --no-daemon
-
+          
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-release
           path: android/app/build/outputs/apk/release/app-release-unsigned.apk
+          
