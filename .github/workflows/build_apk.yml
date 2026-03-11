@@ -13,21 +13,19 @@ jobs:
 
       - name: Build APK
         run: |
-          # 1. Proje içindeki bağımlılıkları al
+          # 1. Pub paketlerini al
           flutter pub get
           
-          # 2. Android klasörüne geç
+          # 2. Android klasörüne git
           cd android
           
-          # 3. KÖKLÜ ÇÖZÜM: Mevcut gradle klasörünü sil ve Flutter SDK'nın 
-          # kendi içindeki doğru sürümü eşleştirmesini bekle
-          rm -rf gradle/wrapper/
+          # 3. KÖKLÜ DEĞİŞİM: Gradle Wrapper'ı Flutter SDK'nın 
+          # kendi içindeki güvenli versiyonla eşle
+          ./gradlew wrapper --gradle-version 8.4 --distribution-type bin
           
-          # 4. Gradle Wrapper'ı yeniden oluştur
-          gradle wrapper --gradle-version 8.4
-          
-          # 5. Gradle daemon'ı tamamen kapat (Hataları önler)
-          ./gradlew assembleRelease --no-daemon --stacktrace
+          # 4. SİSTEM GRADLE'INI DEĞİL, WRAPPER'I ÇALIŞTIR
+          # --no-build-cache ve --no-daemon ile temiz bir başlangıç
+          ./gradlew assembleRelease --no-daemon --no-build-cache
           
       - uses: actions/upload-artifact@v4
         with:
